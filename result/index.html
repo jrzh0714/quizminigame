@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Raleway:800" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/public/main.css">
+
+  <meta charset="utf-8">
+  <title>Result</title>
+
+</head>
+
+<body>
+  <div class="resultscontainer">
+    <h1>Results</h1>
+    <br>
+    <ul id="result"></ul>
+    <a href="../">Play again</a>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+  <script>
+    $(function() {
+      var socket = io.connect('/');
+      socket.on('printname', function(name) {
+        $('#result').append($('<h2>').text(name + ","));
+      });
+      socket.on('points', function(points) {
+        $('#result').append($('<h2>').text("Your total point is "+ points));
+      });
+    });
+  </script>
+</body>
+
+</html>

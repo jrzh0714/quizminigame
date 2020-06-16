@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="/public/main.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Raleway:800" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <meta charset="utf-8">
+  <title>Minigame: Guess The Movies!</title>
+</head>
+
+<body>
+  <form class="username_form" action="">
+    <div id="main" class="jumbotron">
+      <div class="title">Guess The Movies!</div>
+      <div class="desc">Try to guess the movie just by looking at the screenshot!</div>
+      <input type="text" id="n" placeholder="Enter your name here!" autocomplete="off" />
+      <input class="options" id="play" type="submit" value="Play!" />
+      <div class="options" id="diff">Difficulty</div>
+        <p>
+          <label>
+            <input id="easy" name="group2" type="radio"  />
+            <span>Easy</span>
+        </label>
+      </p>
+      <p>
+        <label>
+          <input id="medium" name="group2" type="radio"  />
+          <span>Medium</span>
+      </label>
+      </p>
+      <p>
+      <label>
+        <input id="hard" name="group2" type="radio" />
+        <span>Hard</span>
+      </label>
+      </p>
+      <div class="options" id="about">About</div>
+    </div>
+
+  </form>
+  <div class="popup">
+        <h2>About</h2>
+        <p> This is a minigame made by Jiarui Zheng for the course CISC 3300 Internet and Web Programming as the Final Project Assignment.</p>
+        <p> Finalized on May 10, 2019</p>
+        <p class="close">Close</p>
+      </div>
+  <form id="game" class="game">
+    <div class="gameinfo">
+      <div class="level">
+
+      </div>
+      <div class="points">
+
+      </div>
+    </div>
+    <div class="sccontainer">
+      <img id="screenshot" src="">
+    </div>
+    <div class="choices_container">
+      <div class="choices">
+        <label>
+          <input id="value1"name="group1" type="radio" value="1" />
+          <span id="film1">Option 1</span>
+        </label>
+      </div>
+      <div class="choices">
+        <label>
+          <input id="value2"name="group1" type="radio" value="2" />
+          <span id="film2">Option 2</span>
+        </label>
+      </div>
+      <div class="choices">
+        <label>
+          <input id="value3" name="group1" type="radio" value="3" />
+          <span id="film3">Option 3</span>
+        </label>
+      </div>
+      <div class="choices">
+        <label>
+          <input id="value4"name="group1" type="radio" value="4" />
+          <span id="film4">Option 4</span>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="button">Next</button>
+  </form>
+
+
+  <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+  <script>
+    $(function() {
+      var socket = io();
+      var username;
+      var i;
+      var choices_local = [];
+
+      socket.emit('resetpoint', 0);
+      $('.game').hide();
+
+      $(".username_form").submit(function() {
+        username = $("#n").val();
+        $(this).remove();
+        $('h1').hide();
+        $(".game").show();
+        socket.emit('user', username);
+        i=1;
+        return false;
+      });
+
+      $("#easy").click(function() {
+        socket.emit('difficulty', 'easy');
+      });
+      $("#medium").click(function() {
+        socket.emit('difficulty', 'med');
+      });
+      $("#hard").click(function() {
+        socket.emit('difficulty', 'hard');
+      });
+      $("#about").click(function() {
+        $(".popup").addClass("active");
+      });
+      $(".close").click(function(){
+        $(".popup").removeClass("active");
+      });
+
+
+      socket.on('loadplaylist', function(data) {
+        socket.emit('load', i);
+      });
+
+      socket.on('load', function(img) {
+        $("#screenshot").attr("src","/movies_sc/" + img);
+      });
+      socket.on('level', function(level) {
+        $('.level').html($('<h2>').text("Level "+ level));
+      });
+      socket.on('updatepoints', function(points) {
+        $('.points').html($('<h2>').text("Points: "+ points));
+      });
+
+      socket.on('choices', function(ch) {
+        choices_local = ch;
+      });
+      socket.on('c1', function(c1) {
+        console.log(c1);
+        console.log(choices_local[0]);
+
+        $("#film1").html(c1);
+        $("#value1").attr("value", choices_local[0]);
+
+      });
+
+      socket.on('c2', function(c2) {
+        console.log(c2);
+        console.log(choices_local[1]);
+        $("#film2").html(c2);
+        $("#value2").attr("value", choices_local[1]);
+
+      });
+      socket.on('c3', function(c3) {
+        console.log(c3);
+        console.log(choices_local[2]);
+        $("#film3").html(c3);
+        $("#value3").attr("value", choices_local[2]);
+
+      });
+      socket.on('c4', function(c3) {
+        console.log(c3);
+        console.log(choices_local[3]);
+        $("#film4").html(c3);
+        $("#value4").attr("value", choices_local[3]);
+
+      });
+
+      $('.game').submit(function() {
+        if (i == 3) {
+          $('.button').html("End & Proceed to Results");
+          $('.button').click(function() {
+            window.location.href = '/result';
+          })
+        }
+        socket.emit('select', $('input[name=group1]:checked', '#game').val());
+        socket.emit('level', i);
+        $('input[name=group1]:checked').prop("checked", false);
+        if(i<4){
+          i++;
+          }
+        socket.emit('load', i);
+        return false;
+      });
+
+
+
+    });
+  </script>
+</body>
+
+</html>

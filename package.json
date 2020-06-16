@@ -1,0 +1,25 @@
+{
+  "name": "Internet-and-Web-Programming-Final",
+  "version": "1.0.0",
+  "description": "A Node.js Minigame using Express ",
+  "engines": {
+    "node": "10.x"
+  },
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bufferutil": "4.0.1",
+    "express": "^4.15.2",
+    "socket.io": ">= 1.0.0",
+    "utf-8-validate": "5.0.2",
+    "ws": "7.0.0"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "express"
+  ]
+}
