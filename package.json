@@ -15,7 +15,7 @@
     "express": "^4.15.2",
     "socket.io": ">= 1.0.0",
     "utf-8-validate": "5.0.2",
-    "ws": "7.0.0"
+    "ws": "7.4.6"
   },
   "keywords": [
     "node",
